@@ -5,6 +5,9 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 import { PointerLockControls } from "three/examples/jsm/controls/PointerLockControls.js";
+const clock = new THREE.Clock(); // Add a clock instance
+
+
 
 interface ModelViewerProps {
   modelUrl: string;
@@ -100,10 +103,11 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      controls.update();
+      const delta = clock.getDelta(); // Get time difference
+      controls.update(delta); // Pass delta to update
       renderer.render(scene, camera);
     };
-
+    
     animate();
 
     const handleResize = () => {
