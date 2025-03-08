@@ -30,7 +30,6 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   const [bgColor, setBgColor] = useState("#202020");
   const [useFirstPerson, setUseFirstPerson] = useState(false);
 
-  // 🔹 1️⃣ Initialize Scene, Camera, and Renderer (Only Once)
   useEffect(() => {
     if (!mountRef.current) return;
 
@@ -65,31 +64,30 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     directionalLight.position.set(5, 10, 7.5);
     scene.add(directionalLight);
 
-    if (showGrid) scene.add(new THREE.GridHelper(30, 30));
-    if (showAxes) scene.add(new THREE.AxesHelper(5));
+    const gridHelper = new THREE.GridHelper(30, 30);
+    gridHelper.name = "grid";
+    scene.add(gridHelper);
+
+    const axesHelper = new THREE.AxesHelper(5);
+    axesHelper.name = "axes";
+    scene.add(axesHelper);
 
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-      const delta = clock.getDelta();
-    
-      if ("update" in controls) {
-        controls.update(delta); // Call update only if it exists and requires an argument
-      }
-    
+      controls.update();
       renderer.render(scene, camera);
     };
-    
+    animate();
 
-    // Handle window resize
+    // Handle Resize
     const handleResize = () => {
-      if (!mountRef.current) return; // ✅ Prevent null reference errors
+      if (!mountRef.current) return;
       const { clientWidth, clientHeight } = mountRef.current;
       camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(clientWidth, clientHeight);
     };
-    
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -98,9 +96,8 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
       controls.dispose();
       renderer.dispose();
     };
-  }, []);
+  }, [useFirstPerson, rotationSpeed]);
 
-  // 🔹 2️⃣ Load Model (Only When `modelUrl` Changes)
   useEffect(() => {
     if (!sceneRef.current || !modelUrl) return;
 
@@ -119,17 +116,16 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
           }
         });
 
-        // Center & Scale the Model
+        // Bounding Box Calculations
         const box = new THREE.Box3().setFromObject(object);
+        const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
         const scaleFactor = 5 / maxDim;
 
         object.scale.setScalar(scaleFactor);
-        object.position.set(0, 1.5, 0);
-
-        const center = box.getCenter(new THREE.Vector3());
         object.position.sub(center.multiplyScalar(scaleFactor));
+        object.position.y += size.y * scaleFactor / 2; // Ensure it rests on the grid
 
         sceneRef.current?.add(object);
         modelRef.current = object;
@@ -139,31 +135,18 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     );
   }, [modelUrl]);
 
-  // 🔹 3️⃣ Update Model Properties Without Reloading It
   useEffect(() => {
-    if (!modelRef.current) return;
-    modelRef.current.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        const material = mesh.material;
-  
-        if (Array.isArray(material)) {
-          // If material is an array, update each material
-          material.forEach((mat) => {
-            if (mat instanceof THREE.MeshStandardMaterial) {
-              mat.color.set(color);
-              mat.wireframe = wireframe;
-            }
-          });
-        } else if (material instanceof THREE.MeshStandardMaterial) {
-          // If material is a single material
-          material.color.set(color);
-          material.wireframe = wireframe;
-        }
-      }
+    if (!sceneRef.current) return;
+    sceneRef.current.background = new THREE.Color(bgColor);
+  }, [bgColor]);
+
+  useEffect(() => {
+    if (!sceneRef.current) return;
+    sceneRef.current.children.forEach((child) => {
+      if (child.name === "grid") child.visible = showGrid;
+      if (child.name === "axes") child.visible = showAxes;
     });
-  }, [color, wireframe]);
-  
+  }, [showGrid, showAxes]);
 
   return (
     <div className="w-full h-full bg-gray-200 flex flex-col items-center">
