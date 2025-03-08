@@ -71,17 +71,25 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
-      controls.update();
+      const delta = clock.getDelta();
+    
+      if ("update" in controls) {
+        controls.update(delta); // Call update only if it exists and requires an argument
+      }
+    
       renderer.render(scene, camera);
     };
-    animate();
+    
 
     // Handle window resize
     const handleResize = () => {
-      camera.aspect = mountRef.current.clientWidth / mountRef.current.clientHeight;
+      if (!mountRef.current) return; // ✅ Prevent null reference errors
+      const { clientWidth, clientHeight } = mountRef.current;
+      camera.aspect = clientWidth / clientHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
+      renderer.setSize(clientWidth, clientHeight);
     };
+    
     window.addEventListener("resize", handleResize);
 
     return () => {
@@ -136,11 +144,26 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     if (!modelRef.current) return;
     modelRef.current.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
-        (child as THREE.Mesh).material.color.set(color);
-        (child as THREE.Mesh).material.wireframe = wireframe;
+        const mesh = child as THREE.Mesh;
+        const material = mesh.material;
+  
+        if (Array.isArray(material)) {
+          // If material is an array, update each material
+          material.forEach((mat) => {
+            if (mat instanceof THREE.MeshStandardMaterial) {
+              mat.color.set(color);
+              mat.wireframe = wireframe;
+            }
+          });
+        } else if (material instanceof THREE.MeshStandardMaterial) {
+          // If material is a single material
+          material.color.set(color);
+          material.wireframe = wireframe;
+        }
       }
     });
   }, [color, wireframe]);
+  
 
   return (
     <div className="w-full h-full bg-gray-200 flex flex-col items-center">
