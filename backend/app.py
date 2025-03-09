@@ -9,7 +9,6 @@ UPLOAD_FOLDER = 'uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# Upload file route
 @app.route('/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files:
@@ -22,7 +21,6 @@ def upload_file():
     file.save(filepath)
     return jsonify({"message": "File uploaded", "filename": file.filename}), 200
 
-# Retrieve 3D model route
 @app.route('/models/<filename>', methods=['GET'])
 def get_model(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)

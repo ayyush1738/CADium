@@ -22,7 +22,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
 
   const [wireframe, setWireframe] = useState(true);
   const [color, setColor] = useState("#C8C8C8");
-  const [rotationSpeed, setRotationSpeed] = useState(1.0);
+  const [rotationSpeed, setRotationSpeed] = useState(0.5);
   const [showGrid, setShowGrid] = useState(true);
   const [showAxes, setShowAxes] = useState(true);
   const [ambientIntensity, setAmbientIntensity] = useState(1);
@@ -37,7 +37,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     scene.background = new THREE.Color(bgColor);
     sceneRef.current = scene;
 
-    const camera = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000);
     camera.position.set(0, 5, 10);
     cameraRef.current = camera;
 
@@ -64,7 +64,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     directionalLight.position.set(5, 10, 7.5);
     scene.add(directionalLight);
 
-    const gridHelper = new THREE.GridHelper(30, 30);
+    const gridHelper = new THREE.GridHelper(20, 20);
     gridHelper.name = "grid";
     scene.add(gridHelper);
 
@@ -149,29 +149,21 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   }, [showGrid, showAxes]);
 
   return (
-    <div className="w-full h-full bg-gray-200 flex flex-col items-center">
-      <div className="w-full h-[90%]" ref={mountRef} />
+    <div className="w-screen h-full flex flex-col items-center">
+      <div className="w-screen h-[100%]" ref={mountRef} />
 
-      <div className="flex flex-wrap space-x-4 mt-2">
-        <button onClick={() => setWireframe(!wireframe)} className="px-4 py-2 bg-green-500 text-white rounded">Toggle Wireframe</button>
-        <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="border p-1 rounded"/>
+      <div className="flex flex-wrap space-x-4 mt-2 bg-indigo-950 shadow-lg shadow-fuchsia-100 absolute p-2 px-6 rounded-4xl">
+        <button onClick={() => setWireframe(!wireframe)} className="px-4 py-2 bg-green-500 h-10 text-white rounded">Toggle Wireframe</button>
         <button onClick={() => setShowGrid(!showGrid)} className="px-4 py-2 bg-purple-500 text-white rounded">Toggle Grid</button>
         <button onClick={() => setShowAxes(!showAxes)} className="px-4 py-2 bg-red-500 text-white rounded">Toggle Axes</button>
+        <div className="flex flex-wrap space-x-4 mt-2">
+          <label className="text-sm py-1">Object Color</label>
+          <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="border p-1 rounded"/>
+          <label className="text-sm py-1">Background</label>
+          <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="border p-1 rounded"/>
+        </div>
       </div>
 
-      <div className="flex flex-wrap space-x-4 mt-2">
-        <label className="text-sm">Rotation Speed</label>
-        <input type="range" min="0.1" max="5" step="0.1" value={rotationSpeed} onChange={(e) => setRotationSpeed(Number(e.target.value))} />
-
-        <label className="text-sm">Ambient Light</label>
-        <input type="range" min="0" max="5" step="0.1" value={ambientIntensity} onChange={(e) => setAmbientIntensity(Number(e.target.value))} />
-
-        <label className="text-sm">Directional Light</label>
-        <input type="range" min="0" max="5" step="0.1" value={directionalIntensity} onChange={(e) => setDirectionalIntensity(Number(e.target.value))} />
-
-        <label className="text-sm">Background Color</label>
-        <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="border p-1 rounded"/>
-      </div>
     </div>
   );
 };
