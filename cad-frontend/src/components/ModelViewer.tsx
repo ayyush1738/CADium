@@ -153,9 +153,9 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
       <div className="w-screen h-[100%]" ref={mountRef} />
 
       <div className="flex flex-wrap space-x-4 mt-2 bg-indigo-950 shadow-lg shadow-fuchsia-100 absolute p-2 px-6 rounded-4xl">
-        <button onClick={() => setWireframe(!wireframe)} className="px-4 py-2 bg-green-500 h-10 text-white rounded">Toggle Wireframe</button>
-        <button onClick={() => setShowGrid(!showGrid)} className="px-4 py-2 bg-purple-500 text-white rounded">Toggle Grid</button>
-        <button onClick={() => setShowAxes(!showAxes)} className="px-4 py-2 bg-red-500 text-white rounded">Toggle Axes</button>
+        <button onClick={() => setWireframe(!wireframe)} className="px-4 py-2 bg-green-800 h-10 text-white rounded cursor-pointer">Toggle Wireframe</button>
+        <button onClick={() => setShowGrid(!showGrid)} className="px-4 py-2 bg-fuchsia-700 text-white rounded cursor-pointer">Toggle Grid</button>
+        <button onClick={() => setShowAxes(!showAxes)} className="px-4 py-2 bg-red-500 text-white rounded cursor-pointer">Toggle Axis</button>
         <div className="flex flex-wrap space-x-4 mt-2">
           <label className="text-sm py-1">Object Color</label>
           <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="border p-1 rounded"/>
