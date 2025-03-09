@@ -28,7 +28,9 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   const [ambientIntensity, setAmbientIntensity] = useState(1);
   const [directionalIntensity, setDirectionalIntensity] = useState(1);
   const [bgColor, setBgColor] = useState("#000000");
+  const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
 
+  const movementStep = 0.5;
   const rotationSpeed = 0.15;
 
   /** 📌 Three.js Initialization **/
@@ -77,7 +79,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
 
     // Initialize grid and axes helpers
     if (!gridHelperRef.current) {
-      gridHelperRef.current = new THREE.GridHelper(20, 20);
+      gridHelperRef.current = new THREE.GridHelper(50, 50);
       sceneRef.current.add(gridHelperRef.current);
     }
     if (!axesHelperRef.current) {
@@ -160,12 +162,26 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     }
   }, [showAxes]);
 
+  useEffect(() => {
+    if (modelRef.current) {
+      modelRef.current.position.set(position.x, position.y, position.z);
+    }
+  }, [position]);
+
+  const takeScreenshot = () => {
+    if (!rendererRef.current) return;
+    const link = document.createElement("a");
+    link.href = rendererRef.current.domElement.toDataURL("image/png");
+    link.download = "3D_Model_Screenshot.png";
+    link.click();
+  };
+
   /** 📌 UI Controls **/
   return (
     <div className="w-full h-screen flex flex-col items-center relative">
       <div className="w-full h-full" ref={mountRef} />
 
-      <div className="flex flex-wrap space-x-4 mt-2 w-3/4 bg-slate-800 shadow-lg shadow-[rgba(245, 208, 254, 0.4)] absolute p-2 px-6 rounded-4xl">
+      <div className="flex flex-wrap space-x-4 mt-2 w-3/4 bg-slate-800 shadow-lg shadow-[#bcbcf070] absolute p-2 px-6 rounded-4xl">
         <button 
           onClick={() => setWireframe(!wireframe)}
           className="px-4 py-2 bg-green-800 h-10 text-white rounded cursor-pointer"
@@ -194,6 +210,17 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
           <label className="text-sm py-1">Background</label>
           <input type="color" value={bgColor} onChange={(e) => setBgColor(e.target.value)} className="border p-1 rounded" />
         </div>
+      </div>
+
+      <div className="h-40 w-40 rounded-full bg-gray-600 absolute top-30 left-3/4 right-1/2">
+        <button className="mt-18 ml-2 absolute" onClick={() => setPosition((p) => ({ ...p, x: p.x - movementStep }))}>Left</button>
+        <button className="mt-18 right-2 absolute" onClick={() => setPosition((p) => ({ ...p, x: p.x + movementStep }))}>Right</button>
+        <button className="mt-30 ml-14 absolute" onClick={() => setPosition((p) => ({ ...p, y: p.y - movementStep }))}>Down</button>
+        <button className="mt-2 ml-17 absolute" onClick={() => setPosition((p) => ({ ...p, y: p.y + movementStep }))}>Up</button>
+        <button onClick={() => setPosition((p) => ({ ...p, z: p.z - movementStep }))}>Backward</button>
+        <button onClick={() => setPosition((p) => ({ ...p, z: p.z + movementStep }))}>Forward</button>
+        <button onClick={takeScreenshot}>Take Screenshot</button>
+
       </div>
     </div>
   );
