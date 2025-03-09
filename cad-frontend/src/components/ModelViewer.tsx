@@ -72,7 +72,6 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     axesHelper.name = "axes";
     scene.add(axesHelper);
 
-    // Animation loop
     const animate = () => {
       requestAnimationFrame(animate);
       controls.update();
@@ -80,7 +79,6 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     };
     animate();
 
-    // Handle Resize
     const handleResize = () => {
       if (!mountRef.current) return;
       const { clientWidth, clientHeight } = mountRef.current;
@@ -116,7 +114,6 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
           }
         });
 
-        // Bounding Box Calculations
         const box = new THREE.Box3().setFromObject(object);
         const center = box.getCenter(new THREE.Vector3());
         const size = box.getSize(new THREE.Vector3());
@@ -125,7 +122,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
 
         object.scale.setScalar(scaleFactor);
         object.position.sub(center.multiplyScalar(scaleFactor));
-        object.position.y += size.y * scaleFactor / 2; // Ensure it rests on the grid
+        object.position.y += size.y * scaleFactor / 2;
 
         sceneRef.current?.add(object);
         modelRef.current = object;
@@ -136,17 +133,17 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   }, [modelUrl]);
 
   useEffect(() => {
-    if (!sceneRef.current) return;
-    sceneRef.current.background = new THREE.Color(bgColor);
-  }, [bgColor]);
-
-  useEffect(() => {
-    if (!sceneRef.current) return;
-    sceneRef.current.children.forEach((child) => {
-      if (child.name === "grid") child.visible = showGrid;
-      if (child.name === "axes") child.visible = showAxes;
+    if (!modelRef.current) return;
+    modelRef.current.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        const material = mesh.material as THREE.MeshStandardMaterial;
+        material.color.set(color);
+        material.wireframe = wireframe;
+        material.needsUpdate = true;
+      }
     });
-  }, [showGrid, showAxes]);
+  }, [wireframe, color]);
 
   return (
     <div className="w-screen h-full flex flex-col items-center">
