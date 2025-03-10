@@ -13,6 +13,7 @@ export default function ViewModelPage() {
 
   return (
     <div className="w-full h-screen flex items-center justify-center">
+      <h1 className="absolute text-4xl">CADium</h1>
       <ModelViewer modelUrl={modelUrl} />
     </div>
   );

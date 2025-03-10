@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
@@ -15,6 +15,7 @@ interface ModelCanvasProps {
   ambientIntensity: number;
   directionalIntensity: number;
   position: { x: number; y: number; z: number };
+  scale: number;
 }
 
 const ModelCanvas: React.FC<ModelCanvasProps> = ({
@@ -27,6 +28,7 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   ambientIntensity,
   directionalIntensity,
   position,
+  scale,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
@@ -36,8 +38,11 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   const controlsRef = useRef<OrbitControls | null>(null);
   const gridHelperRef = useRef<THREE.GridHelper | null>(null);
   const axesHelperRef = useRef<THREE.AxesHelper | null>(null);
+  const ambientLightRef = useRef<THREE.AmbientLight | null>(null);
+  const directionalLightRef = useRef<THREE.DirectionalLight | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-  /** 📌 Three.js Initialization **/
+  /** 📌 Initialize Scene **/
   useEffect(() => {
     if (!mountRef.current) return;
 
@@ -61,24 +66,23 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     if (!controlsRef.current) {
       controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
       controlsRef.current.enableDamping = true;
-      controlsRef.current.autoRotate = true;
-      controlsRef.current.autoRotateSpeed = 0.15;
+      controlsRef.current.autoRotate = false;
     }
 
-    sceneRef.current.children = sceneRef.current.children.filter(child => !(child instanceof THREE.Light));
-    sceneRef.current.add(new THREE.AmbientLight(0xffffff, ambientIntensity));
-    const directionalLight = new THREE.DirectionalLight(0xffffff, directionalIntensity);
-    directionalLight.position.set(5, 10, 7.5);
-    sceneRef.current.add(directionalLight);
+    // Lights
+    ambientLightRef.current = new THREE.AmbientLight(0xffffff, ambientIntensity);
+    sceneRef.current.add(ambientLightRef.current);
 
-    if (!gridHelperRef.current) {
-      gridHelperRef.current = new THREE.GridHelper(50, 50);
-      sceneRef.current.add(gridHelperRef.current);
-    }
-    if (!axesHelperRef.current) {
-      axesHelperRef.current = new THREE.AxesHelper(5);
-      sceneRef.current.add(axesHelperRef.current);
-    }
+    directionalLightRef.current = new THREE.DirectionalLight(0xffffff, directionalIntensity);
+    directionalLightRef.current.position.set(5, 10, 7.5);
+    sceneRef.current.add(directionalLightRef.current);
+
+    // Helpers
+    gridHelperRef.current = new THREE.GridHelper(50, 50);
+    sceneRef.current.add(gridHelperRef.current);
+
+    axesHelperRef.current = new THREE.AxesHelper(5);
+    sceneRef.current.add(axesHelperRef.current);
 
     const animate = () => {
       controlsRef.current?.update();
@@ -96,11 +100,11 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-  }, [bgColor, ambientIntensity, directionalIntensity]);
+  }, []);
 
-  /** 📌 Load 3D Model with Centering & Scaling **/
+  /** 📌 Load 3D Model **/
   useEffect(() => {
-    if (!sceneRef.current || !modelUrl) return;
+    if (!sceneRef.current || !modelUrl || initialized) return;
 
     const loader = new OBJLoader();
     loader.load(modelUrl, (object) => {
@@ -108,17 +112,9 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
         sceneRef.current?.remove(modelRef.current);
       }
 
-      // Apply wireframe & color
-      object.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(color),
-            wireframe: wireframe,
-          });
-        }
-      });
+      modelRef.current = object;
 
-      // Center and scale model
+      // Scale and Center Model
       const box = new THREE.Box3().setFromObject(object);
       const center = box.getCenter(new THREE.Vector3());
       const size = box.getSize(new THREE.Vector3());
@@ -126,14 +122,54 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
       const scaleFactor = 5 / maxDim;
 
       object.scale.setScalar(scaleFactor);
-      object.position.sub(center.multiplyScalar(scaleFactor));
+      object.position.set(-center.x * scaleFactor, -center.y * scaleFactor, -center.z * scaleFactor);
       object.position.y += (size.y * scaleFactor) / 2;
+      object.scale.set(scale, scale, scale);
 
-      // Attach model to scene
+
+      // Set initial position
+      object.position.set(position.x, position.y, position.z);
+
       sceneRef.current?.add(object);
-      modelRef.current = object;
+      setInitialized(true);
     });
-  }, [modelUrl, color, wireframe]);
+  }, [modelUrl, initialized]);
+
+  /** 📌 Apply Position Updates **/
+  useEffect(() => {
+    if (modelRef.current) {
+      modelRef.current.position.set(position.x, position.y, position.z);
+    }
+  }, [position]);
+
+  /** 📌 Apply Color and Wireframe Updates **/
+  useEffect(() => {
+    if (modelRef.current) {
+      modelRef.current.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          const material = mesh.material;
+  
+          if (Array.isArray(material)) {
+            material.forEach((mat) => {
+              if ("color" in mat) mat.color.set(new THREE.Color(color)); // ✅ Only update if `color` exists
+              mat.wireframe = wireframe;
+            });
+          } else if ("color" in material) {
+            material.color.set(new THREE.Color(color)); // ✅ Safe to use
+            material.wireframe = wireframe;
+          }
+        }
+      });
+    }
+  }, [color, wireframe]);
+  
+
+  /** 📌 Apply Light Intensity Updates **/
+  useEffect(() => {
+    if (ambientLightRef.current) ambientLightRef.current.intensity = ambientIntensity;
+    if (directionalLightRef.current) directionalLightRef.current.intensity = directionalIntensity;
+  }, [ambientIntensity, directionalIntensity]);
 
   /** 📌 Toggle Grid & Axes Visibility **/
   useEffect(() => {
@@ -144,12 +180,12 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     if (axesHelperRef.current) axesHelperRef.current.visible = showAxes;
   }, [showAxes]);
 
-  /** 📌 Apply Position Updates **/
+  /** 📌 Apply Background Color Change **/
   useEffect(() => {
-    if (modelRef.current) {
-      modelRef.current.position.set(position.x, position.y, position.z);
+    if (sceneRef.current) {
+      sceneRef.current.background = new THREE.Color(bgColor);
     }
-  }, [position]);
+  }, [bgColor]);
 
   return <div className="w-full h-full" ref={mountRef} />;
 };

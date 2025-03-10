@@ -18,9 +18,11 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   const [directionalIntensity, setDirectionalIntensity] = useState(1);
   const [bgColor, setBgColor] = useState("#000000"); 
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
+  const [scale, setScale] = useState(1); // ✅ New state for resizing the object
 
   return (
     <div className="w-full h-full flex flex-col items-center relative bg-gray-900 text-white">
+      <h1 className="absolute text-fuchsia-200 top-6 left-10 text-4xl">CADium</h1>
       <ModelCanvas
         modelUrl={modelUrl}
         wireframe={wireframe}
@@ -31,6 +33,7 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
         ambientIntensity={ambientIntensity}
         directionalIntensity={directionalIntensity}
         position={position}
+        scale={scale} // ✅ Passing scale to ModelCanvas
       />
       <ControlPanel
         setWireframe={setWireframe}
@@ -40,6 +43,12 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
         setBgColor={setBgColor}
         color={color} 
         bgColor={bgColor} 
+        setAmbientIntensity={setAmbientIntensity}
+        setDirectionalIntensity={setDirectionalIntensity}
+        ambientIntensity={ambientIntensity}
+        directionalIntensity={directionalIntensity}
+        setScale={setScale} // ✅ Pass scale setter to ControlPanel
+        scale={scale} // ✅ Pass current scale
       />
       <MovementControls setPosition={setPosition} />
     </div>
