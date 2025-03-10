@@ -52,7 +52,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
       <div
-        className={`bg-gray-900 text-black shadow-lg rounded-3xl backdrop-blur-md transition-all duration-300 p-4 flex flex-col space-y-4 ${
+        className={` shadow-fuchsia-300 text-black shadow-lg rounded-3xl backdrop-blur-md transition-all duration-300 p-4 flex flex-col space-y-4 ${
           showControls ? "scale-100 opacity-100 w-64" : "scale-0 opacity-0 w-0"
         }`}
       >
@@ -152,7 +152,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Floating Button to Expand Controls */}
       <button
         onClick={() => setShowControls((prev) => !prev)}
-        className="w-14 h-14 flex items-center justify-center bg-fuchsia-300 hover:bg-fuchsia-400 text-black shadow-lg rounded-full cursor-pointer transition-all duration-800"
+        className="w-14 h-14 flex items-center justify-center bg-fuchsia-100 hover:bg-fuchsia-200 text-black shadow-lg rounded-full cursor-pointer transition-all duration-800"
       >
         <FiSettings size={26} />
       </button>

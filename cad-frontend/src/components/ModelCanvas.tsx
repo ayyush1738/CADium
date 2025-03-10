@@ -124,7 +124,6 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
       object.scale.setScalar(scaleFactor);
       object.position.set(-center.x * scaleFactor, -center.y * scaleFactor, -center.z * scaleFactor);
       object.position.y += (size.y * scaleFactor) / 2;
-      object.scale.set(scale, scale, scale);
 
 
       // Set initial position
@@ -135,6 +134,14 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     });
   }, [modelUrl, initialized]);
 
+  /** 📌 Apply Scaling Updates **/
+  useEffect(() => {
+    if (modelRef.current) {
+      modelRef.current.scale.set(scale, scale, scale);
+    }
+  }, [scale]); // ✅ Now reacts whenever `scale` changes
+
+
   /** 📌 Apply Position Updates **/
   useEffect(() => {
     if (modelRef.current) {
@@ -143,16 +150,21 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   }, [position]);
 
   /** 📌 Apply Color and Wireframe Updates **/
-  useEffect(() => {
-    if (modelRef.current) {
-      modelRef.current.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          (child as THREE.Mesh).material.color.set(new THREE.Color(color));
-          (child as THREE.Mesh).material.wireframe = wireframe;
+
+useEffect(() => {
+  if (modelRef.current) {
+    modelRef.current.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        if (mesh.material && (mesh.material as THREE.MeshStandardMaterial).color) {
+          (mesh.material as THREE.MeshStandardMaterial).color.set(new THREE.Color(color));
+          (mesh.material as THREE.MeshStandardMaterial).wireframe = wireframe;
         }
-      });
-    }
-  }, [color, wireframe]);
+      }
+    });
+  }
+}, [color, wireframe]);
+
 
   /** 📌 Apply Light Intensity Updates **/
   useEffect(() => {
