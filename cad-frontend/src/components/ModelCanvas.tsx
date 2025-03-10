@@ -147,23 +147,12 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     if (modelRef.current) {
       modelRef.current.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
-          const mesh = child as THREE.Mesh;
-          const material = mesh.material;
-  
-          if (Array.isArray(material)) {
-            material.forEach((mat) => {
-              if ("color" in mat) mat.color.set(new THREE.Color(color)); // ✅ Only update if `color` exists
-              mat.wireframe = wireframe;
-            });
-          } else if ("color" in material) {
-            material.color.set(new THREE.Color(color)); // ✅ Safe to use
-            material.wireframe = wireframe;
-          }
+          (child as THREE.Mesh).material.color.set(new THREE.Color(color));
+          (child as THREE.Mesh).material.wireframe = wireframe;
         }
       });
     }
   }, [color, wireframe]);
-  
 
   /** 📌 Apply Light Intensity Updates **/
   useEffect(() => {
