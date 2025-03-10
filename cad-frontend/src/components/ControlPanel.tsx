@@ -51,21 +51,21 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       >
         <button
           onClick={() => setWireframe((prev) => !prev)}
-          className="flex items-center space-x-2 px-4 py-2 bg-green-600 hover:bg-green-500 transition-all duration-300 text-white font-semibold rounded-lg shadow-md"
+          className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300  font-semibold rounded-lg shadow-md"
         >
           <FiGrid size={18} /> <span>Toggle Wireframe</span>
         </button>
 
         <button
           onClick={() => setShowGrid((prev) => !prev)}
-          className="flex items-center space-x-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 transition-all duration-300 text-white font-semibold rounded-lg shadow-md"
+          className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300 font-semibold rounded-lg shadow-md"
         >
           <FiCircle size={18} /> <span>Toggle Grid</span>
         </button>
 
         <button
           onClick={() => setShowAxes((prev) => !prev)}
-          className="flex items-center space-x-2 px-4 py-2 bg-red-600 hover:bg-red-500 transition-all duration-300 text-white font-semibold rounded-lg shadow-md"
+          className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300 font-semibold rounded-lg shadow-md"
         >
           <FiMove size={18} /> <span>Toggle Axis</span>
         </button>

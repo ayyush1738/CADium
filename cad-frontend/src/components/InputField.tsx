@@ -38,7 +38,7 @@ const InputField: React.FC = () => {
   return (
     <div className="flex flex-col items-center text-center justify-center space-y-4">
       {/* Uiverse.io Folder Selection UI */}
-      <h2 className="mb-20">Click The Folder Below To <br/> upload Your 3D File</h2>
+      <h2 className="mb-20">Click The Folder Below To <br/> upload Your 3D File (.OBJ / .STL)</h2>
 
       <label className="relative group flex flex-col items-center justify-center cursor-pointer">
         <input type="file" onChange={handleFileChange} className="border p-2 rounded absolute mt-70 w-60 h-30 mb-70 shadow-2xl shadow-fuchsia-300 border-none" />
