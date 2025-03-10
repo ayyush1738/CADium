@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 
 interface ModelCanvasProps {
   modelUrl: string;
@@ -106,41 +107,84 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   useEffect(() => {
     if (!sceneRef.current || !modelUrl || initialized) return;
 
-    const loader = new OBJLoader();
-    loader.load(modelUrl, (object) => {
-      if (modelRef.current) {
-        sceneRef.current?.remove(modelRef.current);
-      }
+    // Detect file format from URL
+    const fileExtension = modelUrl.split('.').pop()?.toLowerCase();
 
-      modelRef.current = object;
-
-      // Scale and Center Model
-      const box = new THREE.Box3().setFromObject(object);
-      const center = box.getCenter(new THREE.Vector3());
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      const scaleFactor = 5 / maxDim;
-
-      object.scale.setScalar(scaleFactor);
-      object.position.set(-center.x * scaleFactor, -center.y * scaleFactor, -center.z * scaleFactor);
-      object.position.y += (size.y * scaleFactor) / 2;
-
-
-      // Set initial position
-      object.position.set(position.x, position.y, position.z);
-
-      sceneRef.current?.add(object);
-      setInitialized(true);
-    });
+    if (fileExtension === "obj") {
+      const loader = new OBJLoader();
+      loader.load(modelUrl, (object) => {
+        addModelToScene(object);
+      });
+    } else if (fileExtension === "stl") {
+      const loader = new STLLoader();
+      loader.load(modelUrl, (geometry) => {
+        const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), wireframe });
+        const mesh = new THREE.Mesh(geometry, material);
+        addModelToScene(mesh);
+      });
+    }
   }, [modelUrl, initialized]);
+
+  /** 📌 Function to Add Model to Scene **/
+  /** 📌 Function to Add Model to Scene **/
+/** 📌 Function to Add Model to Scene **/
+/** 📌 Function to Add Model to Scene **/
+/** 📌 Function to Add Model to Scene **/
+const addModelToScene = (object: THREE.Object3D) => {
+  if (modelRef.current) {
+    sceneRef.current?.remove(modelRef.current);
+  }
+
+  modelRef.current = object;
+
+  // Scale and Center Model
+  const box = new THREE.Box3().setFromObject(object);
+  const center = box.getCenter(new THREE.Vector3());
+  const size = box.getSize(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const scaleFactor = 5 / maxDim; // Normalize scale for consistency
+
+  object.scale.set(scaleFactor, scaleFactor, scaleFactor);
+  object.position.sub(center.multiplyScalar(scaleFactor)); // Center the model
+  object.position.y += (size.y * scaleFactor) / 2; // Adjust height
+
+  // 🌟 Fix STL rotation issue while keeping everything uniform
+  if (modelUrl.toLowerCase().endsWith(".stl")) {
+    object.rotation.x = -Math.PI / 2; // Rotate STL by -90 degrees on X-axis
+  }
+
+  // 🌟 Apply uniform material for OBJ & STL models
+  object.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh) {
+      const mesh = child as THREE.Mesh;
+
+      // 🔹 Replace OBJ materials to allow color manipulation
+      if (modelUrl.toLowerCase().endsWith(".obj")) {
+        mesh.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), wireframe });
+      } 
+      
+      // 🔹 Apply color and wireframe to both STL & OBJ
+      else if (mesh.material instanceof THREE.MeshStandardMaterial) {
+        mesh.material.color.set(new THREE.Color(color));
+        mesh.material.wireframe = wireframe;
+      }
+    }
+  });
+
+  // Set initial position (custom position input)
+  object.position.set(position.x, position.y, position.z);
+  sceneRef.current?.add(object);
+
+  setInitialized(true);
+};
+
 
   /** 📌 Apply Scaling Updates **/
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.scale.set(scale, scale, scale);
     }
-  }, [scale]); // ✅ Now reacts whenever `scale` changes
-
+  }, [scale]);
 
   /** 📌 Apply Position Updates **/
   useEffect(() => {
@@ -150,21 +194,19 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   }, [position]);
 
   /** 📌 Apply Color and Wireframe Updates **/
-
-useEffect(() => {
-  if (modelRef.current) {
-    modelRef.current.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        if (mesh.material && (mesh.material as THREE.MeshStandardMaterial).color) {
-          (mesh.material as THREE.MeshStandardMaterial).color.set(new THREE.Color(color));
-          (mesh.material as THREE.MeshStandardMaterial).wireframe = wireframe;
+  useEffect(() => {
+    if (modelRef.current) {
+      modelRef.current.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          const mesh = child as THREE.Mesh;
+          if (mesh.material instanceof THREE.MeshStandardMaterial) {
+            mesh.material.color.set(new THREE.Color(color));
+            mesh.material.wireframe = wireframe;
+          }
         }
-      }
-    });
-  }
-}, [color, wireframe]);
-
+      });
+    }
+  }, [color, wireframe]);
 
   /** 📌 Apply Light Intensity Updates **/
   useEffect(() => {

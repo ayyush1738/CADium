@@ -1,6 +1,6 @@
 "use client";
 
-import { FiGrid, FiCircle, FiCamera, FiMove, FiSettings } from "react-icons/fi";
+import { FiGrid, FiCircle, FiMove, FiSettings } from "react-icons/fi";
 import { MdOutlineFormatColorFill, MdOutlineWallpaper } from "react-icons/md";
 import { BsSun, BsLightbulb } from "react-icons/bs";
 import { useState } from "react";
@@ -40,14 +40,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
 }) => {
   const [showControls, setShowControls] = useState(false);
 
-  const takeScreenshot = () => {
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return;
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = "3D_Model_Screenshot.png";
-    link.click();
-  };
+  
 
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
@@ -141,12 +134,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         </div>
 
         {/* Screenshot Button */}
-        <button
-          onClick={takeScreenshot}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 transition-all duration-300 text-white font-semibold rounded-lg shadow-md"
-        >
-          <FiCamera size={18} /> <span>Screenshot</span>
-        </button>
       </div>
 
       {/* Floating Button to Expand Controls */}

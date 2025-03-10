@@ -4,7 +4,7 @@ import { useState } from "react";
 import ModelCanvas from "./ModelCanvas";
 import ControlPanel from "./ControlPanel";
 import MovementControls from "./MovementConrols";
-
+import {FiCamera} from 'react-icons/fi'
 interface ModelViewerProps {
   modelUrl: string;
 }
@@ -20,9 +20,28 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [scale, setScale] = useState(1); // ✅ New state for resizing the object
 
+  const takeScreenshot = () => {
+    const canvas = document.querySelector("canvas");
+    if (!canvas) return;
+  
+    requestAnimationFrame(() => {
+      const link = document.createElement("a");
+      link.href = canvas.toDataURL("image/png");
+      link.download = "3D_Model_Screenshot.png";
+      link.click();
+    });
+  };
+  
+
   return (
     <div className="w-full h-full flex flex-col items-center relative bg-gray-900 text-white">
       <h1 className="absolute text-fuchsia-200 top-6 left-10 text-4xl">CADium</h1>
+      <button
+          onClick={takeScreenshot}
+          className="flex absolute top-6 right-10 items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 transition-all duration-300 text-black cursor-pointer font-semibold rounded-lg shadow-md"
+        >
+          <FiCamera size={18} /> <span>Screenshot</span>
+      </button>
       <ModelCanvas
         modelUrl={modelUrl}
         wireframe={wireframe}
