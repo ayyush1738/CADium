@@ -72,30 +72,90 @@ http://localhost:3000
 
 ## Features
 - **3D File Import**: Load **.obj** and **.stl** files seamlessly.
-- **Interactive Viewing**: Rotate, zoom, and pan with smooth controls.
+- **Interactive Viewing**: Rotate, zoom, move, export in different format, change color with smooth controls.
 - **User-Friendly Interface**: Clean and modern UI for an enhanced user experience.
-- **Performance Optimized**: Efficient rendering to handle complex models.
+- **Performance Optimized**: Efficient rendering.
 - **Cross-Platform Compatibility**: Works across different operating systems.
 
 ## Technologies Used
-- **Frontend**: React.js, Three.js
-- **Rendering**: WebGL
+- **Frontend**: Next.js, Three.js
 - **Styling**: Tailwind CSS
 - **File Processing**: OBJ and STL parsers
 
-## Contributing
-We welcome contributions! Follow these steps:
-1. Fork the repository.
-2. Create a new branch: `git checkout -b feature-branch`
-3. Commit changes: `git commit -m "Add new feature"`
-4. Push the branch: `git push origin feature-branch`
-5. Open a pull request.
+## Testing Routes for Flask Model Conversion API
 
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This section provides details on how to test the Flask API routes.
+
+### Prerequisites
+Ensure you have the required dependencies installed:
+```bash
+pip install flask flask-cors trimesh
+```
+
+### Running the Flask Server
+Start the server using the following command:
+```bash
+python app.py
+```
+
+### Testing Routes
+
+#### 1. Upload File
+**Endpoint:** `/upload`  
+**Method:** `POST`  
+**Description:** Uploads a file to the server.  
+**Example (Using cURL):**
+```bash
+curl -X POST -F "file=@path/to/your/file.stl" http://localhost:5000/upload
+```
+
+#### 2. Retrieve Model
+**Endpoint:** `/models/<filename>`  
+**Method:** `GET`  
+**Description:** Retrieves the uploaded or converted model file.  
+**Example:**
+```bash
+curl -O http://localhost:5000/models/sample.obj
+```
+
+#### 3. Convert Model Format
+**Endpoint:** `/convert/<filename>/<target_format>`  
+**Method:** `GET`  
+**Description:** Converts the uploaded model to the specified format.  
+**Example:**
+```bash
+curl -X GET http://localhost:5000/convert/sample.stl/obj
+```
+
+### Running Automated Tests
+To test the API routes programmatically, create a test script:
+```python
+import requests
+
+BASE_URL = "http://localhost:5000"
+
+# Test File Upload
+files = {"file": open("sample.stl", "rb")}
+response = requests.post(f"{BASE_URL}/upload", files=files)
+print("Upload Response:", response.json())
+
+# Test Retrieve Model
+response = requests.get(f"{BASE_URL}/models/sample.stl")
+print("Retrieve Response:", response.status_code)
+
+# Test Convert Model
+response = requests.get(f"{BASE_URL}/convert/sample.stl/obj")
+print("Convert Response:", response.json())
+```
+
+Run the test script using:
+```bash
+python test_api.py
+
+
 
 ## Contact
 For any questions or suggestions, feel free to reach out:
-- **Email**: your-email@example.com
-- **GitHub**: [yourusername](https://github.com/yourusername)
+- **Email**: ayushsingh_rathore@srmap.edu.in
+- **GitHub**: [ayyush1738](https://github.com/ayyush1738)
 
