@@ -115,32 +115,6 @@ curl -O http://localhost:5000/models/sample.obj
 curl -X GET http://localhost:5000/convert/sample.stl/obj
 ```
 
-### Running Automated Tests
-To test the API routes programmatically, create a test script:
-```python
-import requests
-
-BASE_URL = "http://localhost:5000"
-
-# Test File Upload
-files = {"file": open("sample.stl", "rb")}
-response = requests.post(f"{BASE_URL}/upload", files=files)
-print("Upload Response:", response.json())
-
-# Test Retrieve Model
-response = requests.get(f"{BASE_URL}/models/sample.stl")
-print("Retrieve Response:", response.status_code)
-
-# Test Convert Model
-response = requests.get(f"{BASE_URL}/convert/sample.stl/obj")
-print("Convert Response:", response.json())
-```
-
-Run the test script using:
-```bash
-python test_api.py
-```
-
 ## Contact
 For any questions or suggestions, feel free to reach out:
 - **Email**: ayushsingh_rathore@srmap.edu.in
