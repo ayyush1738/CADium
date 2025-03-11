@@ -86,18 +86,6 @@ http://localhost:3000
 
 This section provides details on how to test the Flask API routes.
 
-### Prerequisites
-Ensure you have the required dependencies installed:
-```bash
-pip install flask flask-cors trimesh
-```
-
-### Running the Flask Server
-Start the server using the following command:
-```bash
-python app.py
-```
-
 ### Testing Routes
 
 #### 1. Upload File
@@ -151,7 +139,6 @@ print("Convert Response:", response.json())
 Run the test script using:
 ```bash
 python test_api.py
-
 
 
 ## Contact
