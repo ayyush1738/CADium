@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CADium - Seamless 3D Model Viewing Experience
 
-## Getting Started
+## Overview
+CADium is a lightweight yet powerful application that enables users to import, view, and interact with 3D models effortlessly. Supporting **.obj** and **.stl** file formats, CADium offers an appealing user interface coupled with intuitive functionality, making it an ideal tool for designers, engineers, and 3D modeling enthusiasts.
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Running the Project
+### Clone the Repository
+```sh
+git clone https://github.com/ayyush1738/Doc-Scanning.git
+cd CADium
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Backend Setup
+```sh
+cd backend
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Ensure you have Python and pip installed:
+```sh
+python --version
+pip --version
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. Create the virtual environment:
+```sh
+python -m venv venv
+```
+This will create a `venv` folder in your project directory that will contain a separate Python environment.
 
-## Learn More
+3. Activate the virtual environment:
+- **On Windows**:
+```sh
+venv\Scripts\activate
+```
+- **On Mac/Linux**:
+```sh
+source venv/bin/activate
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. Install dependencies:
+```sh
+pip install -r requirements.txt
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. Start the backend server:
+```sh
+python app.py
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Frontend Setup
+Go back to the root repository:
+```sh
+cd ..
+cd cad-frontend
+```
 
-## Deploy on Vercel
+1. Install dependencies:
+```sh
+npm install
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2. Start the frontend server:
+```sh
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Running the Application
+Open your browser and navigate to:
+```sh
+http://localhost:3000
+```
+
+## Features
+- **3D File Import**: Load **.obj** and **.stl** files seamlessly.
+- **Interactive Viewing**: Rotate, zoom, and pan with smooth controls.
+- **User-Friendly Interface**: Clean and modern UI for an enhanced user experience.
+- **Performance Optimized**: Efficient rendering to handle complex models.
+- **Cross-Platform Compatibility**: Works across different operating systems.
+
+## Technologies Used
+- **Frontend**: React.js, Three.js
+- **Rendering**: WebGL
+- **Styling**: Tailwind CSS
+- **File Processing**: OBJ and STL parsers
+
+## Contributing
+We welcome contributions! Follow these steps:
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature-branch`
+3. Commit changes: `git commit -m "Add new feature"`
+4. Push the branch: `git push origin feature-branch`
+5. Open a pull request.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Contact
+For any questions or suggestions, feel free to reach out:
+- **Email**: your-email@example.com
+- **GitHub**: [yourusername](https://github.com/yourusername)
+
