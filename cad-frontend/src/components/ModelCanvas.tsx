@@ -16,6 +16,7 @@ interface ModelCanvasProps {
   ambientIntensity: number;
   directionalIntensity: number;
   position: { x: number; y: number; z: number };
+  rotation: { x: number; y: number; z: number };
   scale: number;
 }
 
@@ -29,6 +30,7 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   ambientIntensity,
   directionalIntensity,
   position,
+  rotation,
   scale,
 }) => {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -42,6 +44,17 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   const ambientLightRef = useRef<THREE.AmbientLight | null>(null);
   const directionalLightRef = useRef<THREE.DirectionalLight | null>(null);
   const [initialized, setInitialized] = useState(false);
+
+  useEffect(() => {
+    if (modelRef.current) {
+      modelRef.current.rotation.set(
+        THREE.MathUtils.degToRad(rotation.x),  // ✅ Convert degrees to radians
+        THREE.MathUtils.degToRad(rotation.y),
+        THREE.MathUtils.degToRad(rotation.z)
+      );
+    }
+  }, [rotation]); // ✅ Runs when rotation changes
+  
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -196,26 +209,8 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     if (directionalLightRef.current) directionalLightRef.current.intensity = directionalIntensity;
   }, [ambientIntensity, directionalIntensity]);
 
-  useEffect(() => {
-    if (gridHelperRef.current) {
-      gridHelperRef.current.visible = DisplayGrid;
-    }
-    if (rendererRef.current) {
-      rendererRef.current.render(sceneRef.current!, cameraRef.current!);
-    }
-  }, [DisplayGrid]);
-  
-  useEffect(() => {
-    if (axesHelperRef.current) {
-      axesHelperRef.current.visible = DisplayAxes;
-    }
-    if (rendererRef.current) {
-      rendererRef.current.render(sceneRef.current!, cameraRef.current!);
-    }
-  }, [DisplayAxes]);
-  
 
-
+  
   useEffect(() => {
     if (sceneRef.current) {
       sceneRef.current.background = new THREE.Color(bgColor);

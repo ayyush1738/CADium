@@ -1,5 +1,4 @@
 flask
 flask-cors
 flask-restful
-werkzeug
-meshio
+trimesh

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import ModelCanvas from "./ModelCanvas";
 import ControlPanel from "./ControlPanel";
@@ -21,6 +21,7 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
   const [directionalIntensity, setDirectionalIntensity] = useState(1);
   const [bgColor, setBgColor] = useState("#000000");
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
+  const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
   const [scale, setScale] = useState(1);
   const [loading, setLoading] = useState(true);
   const [converting, setConverting] = useState(false);
@@ -99,7 +100,7 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
         <select
           value={targetFormat}
           onChange={(e) => setTargetFormat(e.target.value)}
-          className="px-4 py-2 z-100 bg-white text-black rounded-md"
+          className="px-4 py-2 z-100 bg-blue-100 hover:bg-blue-200 border-0  cursor-pointer text-black rounded-md"
         >
           <option value="obj">Convert to OBJ</option>
           <option value="stl">Convert to STL</option>
@@ -136,13 +137,12 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
         ambientIntensity={ambientIntensity}
         directionalIntensity={directionalIntensity}
         position={position}
+        rotation={rotation}
         scale={scale}
       />
 
       <ControlPanel
         setWireframe={setWireframe}
-        setDisplayGrid={setDisplayGrid}
-        setDisplayAxes={setDisplayAxes}
         setColor={setColor}
         setBgColor={setBgColor}
         color={color}
@@ -154,7 +154,10 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
         setScale={setScale}
         scale={scale}
       />
-      <MovementControls setPosition={setPosition} />
+      <MovementControls 
+        setPosition={setPosition}
+        setRotation={setRotation}
+      />
     </div>
   );
 };

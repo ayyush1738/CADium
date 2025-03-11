@@ -9,8 +9,6 @@ import { AiOutlineExpand } from "react-icons/ai";
 
 interface ControlPanelProps {
   setWireframe: (value: (prev: boolean) => boolean | boolean) => void;
-  setDisplayGrid: (value: (prev: boolean) => boolean | boolean) => void;
-  setDisplayAxes: (value: (prev: boolean) => boolean | boolean) => void;
   setColor: (value: string) => void;
   setBgColor: (value: string) => void;
   setAmbientIntensity: (value: number) => void;
@@ -25,8 +23,6 @@ interface ControlPanelProps {
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
   setWireframe,
-  setDisplayGrid,
-  setDisplayAxes,
   setColor,
   setBgColor,
   setAmbientIntensity,
@@ -55,21 +51,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           <FiGrid size={18} /> <span>Toggle Wireframe</span>
         </button>
 
-        <button
-          onClick={() => setDisplayGrid((prev) => !prev)}
-          className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300 font-semibold rounded-lg shadow-md"
-        >
-          <FiCircle size={18} /> <span>Toggle Grid</span>
-        </button>
-
-        <button
-          onClick={() => setDisplayAxes((prev) => !prev)}
-          className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300 font-semibold rounded-lg shadow-md"
-        >
-          <FiMove size={18} /> <span>Toggle Axis</span>
-        </button>
-
-        {/* Color Pickers */}
         <div className="flex flex-col space-y-2">
           <div className="flex items-center space-x-3">
             <MdOutlineFormatColorFill size={20} className="text-white" />
@@ -91,7 +72,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           </div>
         </div>
 
-        {/* Ambient Light Intensity Control */}
         <div className="flex items-center space-x-3">
           <BsSun size={20} className="text-yellow-400" />
           <input
@@ -105,7 +85,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           />
         </div>
 
-        {/* Directional Light Intensity Control */}
         <div className="flex items-center space-x-3">
           <BsLightbulb size={20} className="text-blue-400" />
           <input
@@ -132,10 +111,8 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           />
         </div>
 
-        {/* Screenshot Button */}
       </div>
 
-      {/* Floating Button to Expand Controls */}
       <button
         onClick={() => setDisplayControls((prev) => !prev)}
         className="w-14 h-14 flex items-center justify-center bg-fuchsia-100 hover:bg-fuchsia-200 text-black shadow-lg rounded-full cursor-pointer transition-all duration-800"
