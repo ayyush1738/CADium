@@ -215,13 +215,25 @@ const addModelToScene = (object: THREE.Object3D) => {
   }, [ambientIntensity, directionalIntensity]);
 
   /** 📌 Toggle Grid & Axes Visibility **/
-  useEffect(() => {
-    if (gridHelperRef.current) gridHelperRef.current.visible = showGrid;
-  }, [showGrid]);
+  /** 📌 Toggle Grid & Axes Visibility **/
+useEffect(() => {
+  if (gridHelperRef.current) {
+    gridHelperRef.current.visible = showGrid;
+  }
+  if (rendererRef.current) {
+    rendererRef.current.render(sceneRef.current!, cameraRef.current!);
+  }
+}, [showGrid]);
 
-  useEffect(() => {
-    if (axesHelperRef.current) axesHelperRef.current.visible = showAxes;
-  }, [showAxes]);
+useEffect(() => {
+  if (axesHelperRef.current) {
+    axesHelperRef.current.visible = showAxes;
+  }
+  if (rendererRef.current) {
+    rendererRef.current.render(sceneRef.current!, cameraRef.current!);
+  }
+}, [showAxes]);
+
 
   /** 📌 Apply Background Color Change **/
   useEffect(() => {

@@ -21,12 +21,12 @@ const InputField: React.FC = () => {
     formData.append("file", selectedFile);
 
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData, {
+      const response = await axios.post("http://127.0.0.1:5000/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
       const { filename } = response.data;
-      const modelUrl = `http://localhost:5000/models/${filename}`;
+      const modelUrl = `http://127.0.0.1:5000/models/${filename}`;
 
       // Navigate to the Model Viewer page
       router.push(`/model-viewer?modelUrl=${encodeURIComponent(modelUrl)}`);
