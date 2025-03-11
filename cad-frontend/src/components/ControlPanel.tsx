@@ -4,13 +4,13 @@ import { FiGrid, FiCircle, FiMove, FiSettings } from "react-icons/fi";
 import { MdOutlineFormatColorFill, MdOutlineWallpaper } from "react-icons/md";
 import { BsSun, BsLightbulb } from "react-icons/bs";
 import { useState } from "react";
-import { AiOutlineExpand } from "react-icons/ai"; // ✅ New resize icon
+import { AiOutlineExpand } from "react-icons/ai"; 
 
 
 interface ControlPanelProps {
   setWireframe: (value: (prev: boolean) => boolean | boolean) => void;
-  setShowGrid: (value: (prev: boolean) => boolean | boolean) => void;
-  setShowAxes: (value: (prev: boolean) => boolean | boolean) => void;
+  setDisplayGrid: (value: (prev: boolean) => boolean | boolean) => void;
+  setDisplayAxes: (value: (prev: boolean) => boolean | boolean) => void;
   setColor: (value: string) => void;
   setBgColor: (value: string) => void;
   setAmbientIntensity: (value: number) => void;
@@ -25,8 +25,8 @@ interface ControlPanelProps {
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
   setWireframe,
-  setShowGrid,
-  setShowAxes,
+  setDisplayGrid,
+  setDisplayAxes,
   setColor,
   setBgColor,
   setAmbientIntensity,
@@ -38,15 +38,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
   directionalIntensity,
   scale,
 }) => {
-  const [showControls, setShowControls] = useState(false);
+  const [DisplayControls, setDisplayControls] = useState(false);
 
-  
 
   return (
     <div className="fixed bottom-6 right-6 flex flex-col items-end space-y-2">
       <div
         className={` shadow-fuchsia-300 text-black shadow-lg rounded-3xl backdrop-blur-md transition-all duration-300 p-4 flex flex-col space-y-4 ${
-          showControls ? "scale-100 opacity-100 w-64" : "scale-0 opacity-0 w-0"
+          DisplayControls ? "scale-100 opacity-100 w-64" : "scale-0 opacity-0 w-0"
         }`}
       >
         <button
@@ -57,14 +56,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         </button>
 
         <button
-          onClick={() => setShowGrid((prev) => !prev)}
+          onClick={() => setDisplayGrid((prev) => !prev)}
           className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300 font-semibold rounded-lg shadow-md"
         >
           <FiCircle size={18} /> <span>Toggle Grid</span>
         </button>
 
         <button
-          onClick={() => setShowAxes((prev) => !prev)}
+          onClick={() => setDisplayAxes((prev) => !prev)}
           className="flex cursor-pointer items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 text-black transition-all duration-300 font-semibold rounded-lg shadow-md"
         >
           <FiMove size={18} /> <span>Toggle Axis</span>
@@ -138,7 +137,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
 
       {/* Floating Button to Expand Controls */}
       <button
-        onClick={() => setShowControls((prev) => !prev)}
+        onClick={() => setDisplayControls((prev) => !prev)}
         className="w-14 h-14 flex items-center justify-center bg-fuchsia-100 hover:bg-fuchsia-200 text-black shadow-lg rounded-full cursor-pointer transition-all duration-800"
       >
         <FiSettings size={26} />

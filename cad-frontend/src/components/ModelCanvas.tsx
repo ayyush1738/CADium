@@ -11,8 +11,8 @@ interface ModelCanvasProps {
   wireframe: boolean;
   color: string;
   bgColor: string;
-  showGrid: boolean;
-  showAxes: boolean;
+  DisplayGrid: boolean;
+  DisplayAxes: boolean;
   ambientIntensity: number;
   directionalIntensity: number;
   position: { x: number; y: number; z: number };
@@ -24,8 +24,8 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   wireframe,
   color,
   bgColor,
-  showGrid,
-  showAxes,
+  DisplayGrid,
+  DisplayAxes,
   ambientIntensity,
   directionalIntensity,
   position,
@@ -43,7 +43,6 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   const directionalLightRef = useRef<THREE.DirectionalLight | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  /** 📌 Initialize Scene **/
   useEffect(() => {
     if (!mountRef.current) return;
 
@@ -103,11 +102,9 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  /** 📌 Load 3D Model **/
   useEffect(() => {
     if (!sceneRef.current || !modelUrl || initialized) return;
 
-    // Detect file format from URL
     const fileExtension = modelUrl.split('.').pop()?.toLowerCase();
 
     if (fileExtension === "obj") {
@@ -125,11 +122,7 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     }
   }, [modelUrl, initialized]);
 
-  /** 📌 Function to Add Model to Scene **/
-  /** 📌 Function to Add Model to Scene **/
-/** 📌 Function to Add Model to Scene **/
-/** 📌 Function to Add Model to Scene **/
-/** 📌 Function to Add Model to Scene **/
+
 const addModelToScene = (object: THREE.Object3D) => {
   if (modelRef.current) {
     sceneRef.current?.remove(modelRef.current);
@@ -137,33 +130,27 @@ const addModelToScene = (object: THREE.Object3D) => {
 
   modelRef.current = object;
 
-  // Scale and Center Model
   const box = new THREE.Box3().setFromObject(object);
   const center = box.getCenter(new THREE.Vector3());
   const size = box.getSize(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z);
-  const scaleFactor = 5 / maxDim; // Normalize scale for consistency
-
+  const scaleFactor = 5 / maxDim; 
   object.scale.set(scaleFactor, scaleFactor, scaleFactor);
-  object.position.sub(center.multiplyScalar(scaleFactor)); // Center the model
-  object.position.y += (size.y * scaleFactor) / 2; // Adjust height
+  object.position.sub(center.multiplyScalar(scaleFactor)); 
+  object.position.y += (size.y * scaleFactor) / 2; 
 
-  // 🌟 Fix STL rotation issue while keeping everything uniform
   if (modelUrl.toLowerCase().endsWith(".stl")) {
-    object.rotation.x = -Math.PI / 2; // Rotate STL by -90 degrees on X-axis
+    object.rotation.x = -Math.PI / 2; 
   }
 
-  // 🌟 Apply uniform material for OBJ & STL models
   object.traverse((child) => {
     if ((child as THREE.Mesh).isMesh) {
       const mesh = child as THREE.Mesh;
 
-      // 🔹 Replace OBJ materials to allow color manipulation
       if (modelUrl.toLowerCase().endsWith(".obj")) {
         mesh.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), wireframe });
       } 
       
-      // 🔹 Apply color and wireframe to both STL & OBJ
       else if (mesh.material instanceof THREE.MeshStandardMaterial) {
         mesh.material.color.set(new THREE.Color(color));
         mesh.material.wireframe = wireframe;
@@ -171,7 +158,6 @@ const addModelToScene = (object: THREE.Object3D) => {
     }
   });
 
-  // Set initial position (custom position input)
   object.position.set(position.x, position.y, position.z);
   sceneRef.current?.add(object);
 
@@ -179,21 +165,18 @@ const addModelToScene = (object: THREE.Object3D) => {
 };
 
 
-  /** 📌 Apply Scaling Updates **/
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.scale.set(scale, scale, scale);
     }
   }, [scale]);
 
-  /** 📌 Apply Position Updates **/
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.position.set(position.x, position.y, position.z);
     }
   }, [position]);
 
-  /** 📌 Apply Color and Wireframe Updates **/
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.traverse((child) => {
@@ -208,34 +191,30 @@ const addModelToScene = (object: THREE.Object3D) => {
     }
   }, [color, wireframe]);
 
-  /** 📌 Apply Light Intensity Updates **/
   useEffect(() => {
     if (ambientLightRef.current) ambientLightRef.current.intensity = ambientIntensity;
     if (directionalLightRef.current) directionalLightRef.current.intensity = directionalIntensity;
   }, [ambientIntensity, directionalIntensity]);
 
-  /** 📌 Toggle Grid & Axes Visibility **/
-  /** 📌 Toggle Grid & Axes Visibility **/
 useEffect(() => {
   if (gridHelperRef.current) {
-    gridHelperRef.current.visible = showGrid;
+    gridHelperRef.current.visible = DisplayGrid;
   }
   if (rendererRef.current) {
     rendererRef.current.render(sceneRef.current!, cameraRef.current!);
   }
-}, [showGrid]);
+}, [DisplayGrid]);
 
 useEffect(() => {
   if (axesHelperRef.current) {
-    axesHelperRef.current.visible = showAxes;
+    axesHelperRef.current.visible = DisplayAxes;
   }
   if (rendererRef.current) {
     rendererRef.current.render(sceneRef.current!, cameraRef.current!);
   }
-}, [showAxes]);
+}, [DisplayAxes]);
 
 
-  /** 📌 Apply Background Color Change **/
   useEffect(() => {
     if (sceneRef.current) {
       sceneRef.current.background = new THREE.Color(bgColor);

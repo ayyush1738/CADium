@@ -1,6 +1,6 @@
 "use client";
 
-import FileUpload from "../components/FileUpload";
+import FileUploader from "../components/FileUploader";
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
         <h1 className="text-4xl font-sans font-semibold">CADium</h1>
       </nav>
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <FileUpload />
+        <FileUploader />
       </main>
     </div>
   );

@@ -5,32 +5,31 @@ import { useRouter } from "next/navigation";
 import ModelCanvas from "./ModelCanvas";
 import ControlPanel from "./ControlPanel";
 import MovementControls from "./MovementControls";
-import { FiCamera, FiDownload, FiArrowLeft } from "react-icons/fi";
-import { saveAs } from "file-saver";
+import { FiCamera, FiArrowLeft, FiRefreshCcw } from "react-icons/fi";
 
-interface ModelViewerProps {
+interface ModelRendererProps {
   modelUrl: string;
 }
 
-const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
+const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
   const router = useRouter();
   const [wireframe, setWireframe] = useState(false);
   const [color, setColor] = useState("#C8C8C8");
-  const [showGrid, setShowGrid] = useState(true);
-  const [showAxes, setShowAxes] = useState(true);
+  const [DisplayGrid, setDisplayGrid] = useState(true);
+  const [DisplayAxes, setDisplayAxes] = useState(true);
   const [ambientIntensity, setAmbientIntensity] = useState(1);
   const [directionalIntensity, setDirectionalIntensity] = useState(1);
   const [bgColor, setBgColor] = useState("#000000");
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [scale, setScale] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [converting, setConverting] = useState(false);
+  const [targetFormat, setTargetFormat] = useState("obj"); // Default format
 
   useEffect(() => {
-    // Simulate loading state until the model is fully rendered
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 2000); // Adjust timing as needed
-
+    }, 2000);
     return () => clearTimeout(timer);
   }, []);
 
@@ -46,16 +45,34 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     });
   };
 
-  const exportModel = async () => {
+  const convertAndDownloadModel = async () => {
     if (!modelUrl) return;
     try {
-      const response = await fetch(modelUrl);
-      const blob = await response.blob();
-      const fileName = modelUrl.split("/").pop() || "exported_model";
+      setConverting(true);
+      const fileName = modelUrl.split("/").pop();
+      if (!fileName) return;
 
-      saveAs(blob, fileName);
+      // Call the backend API for conversion
+      const response = await fetch(`http://localhost:5000/convert/${fileName}/${targetFormat}`);
+      const result = await response.json();
+
+      if (response.ok) {
+        const convertedModelUrl = result.download_url;
+        
+        // Automatically download the converted file
+        const link = document.createElement("a");
+        link.href = convertedModelUrl;
+        link.download = result.filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error("Conversion failed:", result.error);
+      }
     } catch (error) {
-      console.error("Error exporting model:", error);
+      console.error("Error converting model:", error);
+    } finally {
+      setConverting(false);
     }
   };
 
@@ -63,7 +80,6 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
     <div className="w-full h-full flex flex-col items-center relative bg-gray-900 text-white">
       <h1 className="absolute z-100 text-fuchsia-200 top-6 left-10 text-4xl">CADium</h1>
 
-      {/* Go Back Button */}
       <button
         onClick={() => router.push("/")}
         className="absolute z-100 bottom-10 left-6 flex items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 transition-all duration-300 text-black cursor-pointer font-semibold rounded-lg shadow-md"
@@ -71,7 +87,6 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
         <FiArrowLeft size={18} /> <span>Go Back</span>
       </button>
 
-      {/* Buttons for Screenshot & Export */}
       <div className="absolute top-6 right-10 flex space-x-4">
         <button
           onClick={takeScreenshot}
@@ -80,11 +95,26 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
           <FiCamera size={18} /> <span>Screenshot</span>
         </button>
 
-        <button
-          onClick={exportModel}
-          className="flex z-100 items-center space-x-2 px-4 py-2 bg-green-400 hover:bg-green-500 transition-all duration-300 text-black cursor-pointer font-semibold rounded-lg shadow-md"
+        {/* Format Selection Dropdown */}
+        <select
+          value={targetFormat}
+          onChange={(e) => setTargetFormat(e.target.value)}
+          className="px-4 py-2 z-100 bg-white text-black rounded-md"
         >
-          <FiDownload size={18} /> <span>Export File</span>
+          <option value="obj">Convert to OBJ</option>
+          <option value="stl">Convert to STL</option>
+        </select>
+
+        {/* Convert & Download Button */}
+        <button
+          onClick={convertAndDownloadModel}
+          disabled={converting}
+          className={`flex z-100 items-center space-x-2 px-4 py-2 ${
+            converting ? "bg-gray-400 cursor-not-allowed" : "bg-green-400 hover:bg-green-500"
+          } transition-all duration-300 text-black cursor-pointer font-semibold rounded-lg shadow-md`}
+        >
+          <FiRefreshCcw size={18} />
+          <span>{converting ? "Converting..." : "Convert & Download"}</span>
         </button>
       </div>
 
@@ -96,25 +126,23 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
         </div>
       )}
 
-      {/* 3D Model Canvas */}
       <ModelCanvas
         modelUrl={modelUrl}
         wireframe={wireframe}
         color={color}
         bgColor={bgColor}
-        showGrid={showGrid}
-        showAxes={showAxes}
+        DisplayGrid={DisplayGrid}
+        DisplayAxes={DisplayAxes}
         ambientIntensity={ambientIntensity}
         directionalIntensity={directionalIntensity}
         position={position}
         scale={scale}
       />
 
-      {/* Control Panel & Movement Controls */}
       <ControlPanel
         setWireframe={setWireframe}
-        setShowGrid={setShowGrid}
-        setShowAxes={setShowAxes}
+        setDisplayGrid={setDisplayGrid}
+        setDisplayAxes={setDisplayAxes}
         setColor={setColor}
         setBgColor={setBgColor}
         color={color}
@@ -131,4 +159,4 @@ const ModelViewer: React.FC<ModelViewerProps> = ({ modelUrl }) => {
   );
 };
 
-export default ModelViewer;
+export default ModelRenderer;

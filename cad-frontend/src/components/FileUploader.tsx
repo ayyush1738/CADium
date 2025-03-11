@@ -2,7 +2,7 @@
 
 import InputField from "./InputField";
 
-const FileUpload: React.FC = () => {
+const FileUploader: React.FC = () => {
   return (
     <div className="flex flex-col space-y-3">
       <InputField/>
@@ -10,4 +10,4 @@ const FileUpload: React.FC = () => {
   );
 };
 
-export default FileUpload;
+export default FileUploader;
