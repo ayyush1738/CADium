@@ -123,46 +123,46 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   }, [modelUrl, initialized]);
 
 
-const addModelToScene = (object: THREE.Object3D) => {
-  if (modelRef.current) {
-    sceneRef.current?.remove(modelRef.current);
-  }
-
-  modelRef.current = object;
-
-  const box = new THREE.Box3().setFromObject(object);
-  const center = box.getCenter(new THREE.Vector3());
-  const size = box.getSize(new THREE.Vector3());
-  const maxDim = Math.max(size.x, size.y, size.z);
-  const scaleFactor = 5 / maxDim; 
-  object.scale.set(scaleFactor, scaleFactor, scaleFactor);
-  object.position.sub(center.multiplyScalar(scaleFactor)); 
-  object.position.y += (size.y * scaleFactor) / 2; 
-
-  if (modelUrl.toLowerCase().endsWith(".stl")) {
-    object.rotation.x = -Math.PI / 2; 
-  }
-
-  object.traverse((child) => {
-    if ((child as THREE.Mesh).isMesh) {
-      const mesh = child as THREE.Mesh;
-
-      if (modelUrl.toLowerCase().endsWith(".obj")) {
-        mesh.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), wireframe });
-      } 
-      
-      else if (mesh.material instanceof THREE.MeshStandardMaterial) {
-        mesh.material.color.set(new THREE.Color(color));
-        mesh.material.wireframe = wireframe;
-      }
+  const addModelToScene = (object: THREE.Object3D) => {
+    if (modelRef.current) {
+      sceneRef.current?.remove(modelRef.current);
     }
-  });
 
-  object.position.set(position.x, position.y, position.z);
-  sceneRef.current?.add(object);
+    modelRef.current = object;
 
-  setInitialized(true);
-};
+    const box = new THREE.Box3().setFromObject(object);
+    const center = box.getCenter(new THREE.Vector3());
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scaleFactor = 5 / maxDim; 
+    object.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    object.position.sub(center.multiplyScalar(scaleFactor)); 
+    object.position.y += (size.y * scaleFactor) / 2; 
+
+    if (modelUrl.toLowerCase().endsWith(".stl")) {
+      object.rotation.x = -Math.PI / 2; 
+    }
+
+    object.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+
+        if (modelUrl.toLowerCase().endsWith(".obj")) {
+          mesh.material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), wireframe });
+        } 
+        
+        else if (mesh.material instanceof THREE.MeshStandardMaterial) {
+          mesh.material.color.set(new THREE.Color(color));
+          mesh.material.wireframe = wireframe;
+        }
+      }
+    });
+
+    object.position.set(position.x, position.y, position.z);
+    sceneRef.current?.add(object);
+
+    setInitialized(true);
+  };
 
 
   useEffect(() => {
@@ -196,23 +196,24 @@ const addModelToScene = (object: THREE.Object3D) => {
     if (directionalLightRef.current) directionalLightRef.current.intensity = directionalIntensity;
   }, [ambientIntensity, directionalIntensity]);
 
-useEffect(() => {
-  if (gridHelperRef.current) {
-    gridHelperRef.current.visible = DisplayGrid;
-  }
-  if (rendererRef.current) {
-    rendererRef.current.render(sceneRef.current!, cameraRef.current!);
-  }
-}, [DisplayGrid]);
-
-useEffect(() => {
-  if (axesHelperRef.current) {
-    axesHelperRef.current.visible = DisplayAxes;
-  }
-  if (rendererRef.current) {
-    rendererRef.current.render(sceneRef.current!, cameraRef.current!);
-  }
-}, [DisplayAxes]);
+  useEffect(() => {
+    if (gridHelperRef.current) {
+      gridHelperRef.current.visible = DisplayGrid;
+    }
+    if (rendererRef.current) {
+      rendererRef.current.render(sceneRef.current!, cameraRef.current!);
+    }
+  }, [DisplayGrid]);
+  
+  useEffect(() => {
+    if (axesHelperRef.current) {
+      axesHelperRef.current.visible = DisplayAxes;
+    }
+    if (rendererRef.current) {
+      rendererRef.current.render(sceneRef.current!, cameraRef.current!);
+    }
+  }, [DisplayAxes]);
+  
 
 
   useEffect(() => {
