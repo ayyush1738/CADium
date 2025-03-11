@@ -6,7 +6,7 @@ CADium is a powerful application that enables users to import, view, and interac
 ## Running the Project
 ### Clone the Repository
 ```sh
-git clone https://github.com/ayyush1738/Doc-Scanning.git
+git clone https://github.com/ayyush1738/CADium.git
 cd CADium
 ```
 
