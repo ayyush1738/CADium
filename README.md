@@ -1,7 +1,7 @@
 # CADium - Seamless 3D Model Viewing Experience
 
 ## Overview
-CADium is a lightweight yet powerful application that enables users to import, view, and interact with 3D models effortlessly. Supporting **.obj** and **.stl** file formats, CADium offers an appealing user interface coupled with intuitive functionality, making it an ideal tool for designers, engineers, and 3D modeling enthusiasts.
+CADium is a powerful application that enables users to import, view, and interact with 3D models effortlessly. Supporting **.obj** and **.stl** file formats, CADium offers an appealing user interface coupled with intuitive functionality, making it an ideal tool for the designers.
 
 ## Running the Project
 ### Clone the Repository
