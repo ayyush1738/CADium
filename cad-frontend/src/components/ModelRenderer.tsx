@@ -14,12 +14,12 @@ interface ModelRendererProps {
 const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
   const router = useRouter();
   const [wireframe, setWireframe] = useState(false);
-  const [color, setColor] = useState("#C8C8C8");
+  const [color, setColor] = useState("#6b0ee2");
   const [DisplayGrid, setDisplayGrid] = useState(true);
   const [DisplayAxes, setDisplayAxes] = useState(true);
   const [ambientIntensity, setAmbientIntensity] = useState(1);
   const [directionalIntensity, setDirectionalIntensity] = useState(1);
-  const [bgColor, setBgColor] = useState("#000000");
+  const [bgColor, setBgColor] = useState("#d5d3d7");
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
   const [scale, setScale] = useState(1);
@@ -27,12 +27,6 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
   const [converting, setConverting] = useState(false);
   const [targetFormat, setTargetFormat] = useState("obj"); // Default format
 
-  useEffect(()=>{
-    const timer=setTimeout(() => {
-      setLoading(false);
-    }, 3000);
-    return()=>clearTimeout(timer);
-  }, []);
 
   //Screenshot the view
   const takeScreenshot=() =>{
@@ -117,9 +111,9 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
 
       {/* Loader */}
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black flex-col">
+        <div className="absolute w-screen h-full inset-0 flex items-center justify-center bg-black flex-col">
           <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
-          <section className="text-2xl font-bold mt-10">Rendering...</section>
+          <section className="text-2xl font-bold mt-10">Rendering Scene...</section>
         </div>
       )}
 
@@ -135,7 +129,7 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
         position={position}
         rotation={rotation}
         scale={scale}
-      />
+        setLoading={setLoading}/>
 
       <ControlPanel
         setWireframe={setWireframe}
