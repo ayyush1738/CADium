@@ -79,7 +79,7 @@ http://localhost:3000
 
 ## Features
 - **3D File Import**: Load **.obj** and **.stl** files seamlessly.
-- **Interactive Viewing**: Rotate, zoom, move, export in different format, change color with smooth controls.
+- **Interactive Viewing**: Rotate, zoom, pan, resize, move, export in different format, change color with smooth controls.
 - **User-Friendly Interface**: Clean and modern UI for an enhanced user experience.
 - **Performance Optimized**: Efficient rendering.
 - **Cross-Platform Compatibility**: Works across different operating systems.
