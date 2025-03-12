@@ -10,7 +10,7 @@ import { FiCamera, FiArrowLeft, FiRefreshCcw } from "react-icons/fi";
 interface ModelRendererProps {
   modelUrl: string;
 }
-
+//Loads all the canvas component to render
 const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
   const router = useRouter();
   const [wireframe, setWireframe] = useState(false);
@@ -27,52 +27,50 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
   const [converting, setConverting] = useState(false);
   const [targetFormat, setTargetFormat] = useState("obj"); // Default format
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  useEffect(()=>{
+    const timer=setTimeout(() => {
       setLoading(false);
-    }, 2000);
-    return () => clearTimeout(timer);
+    }, 3000);
+    return()=>clearTimeout(timer);
   }, []);
 
-  const takeScreenshot = () => {
-    const canvas = document.querySelector("canvas");
+  //Screenshot the view
+  const takeScreenshot=() =>{
+    const canvas=document.querySelector("canvas");
     if (!canvas) return;
 
-    requestAnimationFrame(() => {
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "3D_Model_Screenshot.png";
-      link.click();
-    });
+    requestAnimationFrame(()=>{
+      const link= document.createElement("a");
+      link.href= canvas.toDataURL("image/png");
+      link.download= "3D_Model_Screenshot.png";
+      link.click();});
   };
 
-  const convertAndDownloadModel = async () => {
+  //Bonus feature
+  const convertAndDownloadModel =async()=> {
     if (!modelUrl) return;
     try {
       setConverting(true);
       const fileName = modelUrl.split("/").pop();
       if (!fileName) return;
 
-      // Call the backend API for conversion
       const response = await fetch(`http://localhost:5000/convert/${fileName}/${targetFormat}`);
       const result = await response.json();
 
       if (response.ok) {
         const convertedModelUrl = result.download_url;
         
-        // Automatically download the converted file
-        const link = document.createElement("a");
-        link.href = convertedModelUrl;
-        link.download = result.filename;
+        const link= document.createElement("a");
+        link.href =convertedModelUrl;
+        link.download= result.filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
       } else {
-        console.error("Conversion failed:", result.error);
-      }
-    } catch (error) {
+        console.error("Conversion failed:", result.error);}
+    } catch(error) {
       console.error("Error converting model:", error);
-    } finally {
+    }finally{
       setConverting(false);
     }
   };
@@ -82,7 +80,7 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
       <h1 className="absolute z-100 text-fuchsia-200 top-6 left-10 text-4xl">CADium</h1>
 
       <button
-        onClick={() => router.push("/")}
+        onClick={()=> router.push("/")}
         className="absolute z-100 bottom-10 left-6 flex items-center space-x-2 px-4 py-2 bg-fuchsia-300 hover:bg-fuchsia-400 transition-all duration-300 text-black cursor-pointer font-semibold rounded-lg shadow-md"
       >
         <FiArrowLeft size={18} /> <span>Go Back</span>
@@ -96,17 +94,15 @@ const ModelRenderer: React.FC<ModelRendererProps> = ({ modelUrl }) => {
           <FiCamera size={18} /> <span>Screenshot</span>
         </button>
 
-        {/* Format Selection Dropdown */}
         <select
           value={targetFormat}
-          onChange={(e) => setTargetFormat(e.target.value)}
+          onChange={(e)=>setTargetFormat(e.target.value)}
           className="px-4 py-2 z-100 bg-blue-100 hover:bg-blue-200 border-0  cursor-pointer text-black rounded-md"
         >
           <option value="obj">Convert to OBJ</option>
           <option value="stl">Convert to STL</option>
         </select>
 
-        {/* Convert & Download Button */}
         <button
           onClick={convertAndDownloadModel}
           disabled={converting}

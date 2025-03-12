@@ -6,6 +6,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 
+//It contains the actual rendering hooks using three js, i added some functionalities so the code is a bit large :)
 interface ModelCanvasProps {
   modelUrl: string;
   wireframe: boolean;
@@ -15,8 +16,8 @@ interface ModelCanvasProps {
   DisplayAxes: boolean;
   ambientIntensity: number;
   directionalIntensity: number;
-  position: { x: number; y: number; z: number };
-  rotation: { x: number; y: number; z: number };
+  position:{ x: number; y: number; z: number };
+  rotation:{ x: number; y: number; z: number };
   scale: number;
 }
 
@@ -32,7 +33,7 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   position,
   rotation,
   scale,
-}) => {
+})=> {
   const mountRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const modelRef = useRef<THREE.Object3D | null>(null);
@@ -45,88 +46,84 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
   const directionalLightRef = useRef<THREE.DirectionalLight | null>(null);
   const [initialized, setInitialized] = useState(false);
 
-  useEffect(() => {
+  useEffect(()=> {
     if (modelRef.current) {
       modelRef.current.rotation.set(
-        THREE.MathUtils.degToRad(rotation.x),  // ✅ Convert degrees to radians
+        THREE.MathUtils.degToRad(rotation.x),  
         THREE.MathUtils.degToRad(rotation.y),
-        THREE.MathUtils.degToRad(rotation.z)
-      );
+        THREE.MathUtils.degToRad(rotation.z));
     }
-  }, [rotation]); // ✅ Runs when rotation changes
+  }, [rotation]); 
   
-
-  useEffect(() => {
+  useEffect(() =>{
     if (!mountRef.current) return;
 
     if (!sceneRef.current) {
-      sceneRef.current = new THREE.Scene();
+      sceneRef.current= new THREE.Scene();
     }
     sceneRef.current.background = new THREE.Color(bgColor);
-
     if (!cameraRef.current) {
       cameraRef.current = new THREE.PerspectiveCamera(75, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 1000);
       cameraRef.current.position.set(0, 5, 10);
     }
 
-    if (!rendererRef.current) {
-      rendererRef.current = new THREE.WebGLRenderer({ antialias: true });
+    if(!rendererRef.current){
+      rendererRef.current =new THREE.WebGLRenderer({ antialias: true });
       rendererRef.current.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight);
       rendererRef.current.setPixelRatio(window.devicePixelRatio);
       mountRef.current.appendChild(rendererRef.current.domElement);
     }
 
-    if (!controlsRef.current) {
-      controlsRef.current = new OrbitControls(cameraRef.current, rendererRef.current.domElement);
-      controlsRef.current.enableDamping = true;
-      controlsRef.current.autoRotate = false;
+    if(!controlsRef.current) {
+      controlsRef.current=new OrbitControls(cameraRef.current, rendererRef.current.domElement);
+      controlsRef.current.enableDamping=true;
+      controlsRef.current.autoRotate=false;
     }
 
     // Lights
-    ambientLightRef.current = new THREE.AmbientLight(0xffffff, ambientIntensity);
+    ambientLightRef.current=new THREE.AmbientLight(0xffffff, ambientIntensity);
     sceneRef.current.add(ambientLightRef.current);
 
     directionalLightRef.current = new THREE.DirectionalLight(0xffffff, directionalIntensity);
-    directionalLightRef.current.position.set(5, 10, 7.5);
+    directionalLightRef.current.position.set(5,10,7.5);
     sceneRef.current.add(directionalLightRef.current);
 
     // Helpers
-    gridHelperRef.current = new THREE.GridHelper(50, 50);
+    gridHelperRef.current= new THREE.GridHelper(50,50);
     sceneRef.current.add(gridHelperRef.current);
-
     axesHelperRef.current = new THREE.AxesHelper(5);
     sceneRef.current.add(axesHelperRef.current);
 
-    const animate = () => {
+    const animate =() =>{
       controlsRef.current?.update();
-      rendererRef.current?.render(sceneRef.current!, cameraRef.current!);
+      rendererRef.current?.render(sceneRef.current!,cameraRef.current!);
     };
     rendererRef.current.setAnimationLoop(animate);
 
     const handleResize = () => {
       if (!mountRef.current) return;
-      const { clientWidth, clientHeight } = mountRef.current;
-      cameraRef.current!.aspect = clientWidth / clientHeight;
+      const { clientWidth, clientHeight }= mountRef.current;
+      cameraRef.current!.aspect = clientWidth /clientHeight;
       cameraRef.current!.updateProjectionMatrix();
       rendererRef.current!.setSize(clientWidth, clientHeight);
     };
     window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
+    return ()=> window.removeEventListener("resize", handleResize);
   }, []);
 
+  //url
   useEffect(() => {
     if (!sceneRef.current || !modelUrl || initialized) return;
 
     const fileExtension = modelUrl.split('.').pop()?.toLowerCase();
 
     if (fileExtension === "obj") {
-      const loader = new OBJLoader();
+      const loader =new OBJLoader();
       loader.load(modelUrl, (object) => {
         addModelToScene(object);
       });
     } else if (fileExtension === "stl") {
-      const loader = new STLLoader();
+      const loader =new STLLoader();
       loader.load(modelUrl, (geometry) => {
         const material = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), wireframe });
         const mesh = new THREE.Mesh(geometry, material);
@@ -135,7 +132,6 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     }
   }, [modelUrl, initialized]);
 
-
   const addModelToScene = (object: THREE.Object3D) => {
     if (modelRef.current) {
       sceneRef.current?.remove(modelRef.current);
@@ -143,20 +139,20 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
 
     modelRef.current = object;
 
-    const box = new THREE.Box3().setFromObject(object);
-    const center = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const scaleFactor = 5 / maxDim; 
-    object.scale.set(scaleFactor, scaleFactor, scaleFactor);
+    const box =new THREE.Box3().setFromObject(object);
+    const center =box.getCenter(new THREE.Vector3());
+    const size= box.getSize(new THREE.Vector3());
+    const maxDim= Math.max(size.x, size.y, size.z);
+    const scaleFactor= 5 / maxDim; 
+    object.scale.set(scaleFactor, scaleFactor,scaleFactor);
     object.position.sub(center.multiplyScalar(scaleFactor)); 
-    object.position.y += (size.y * scaleFactor) / 2; 
+    object.position.y +=(size.y * scaleFactor)/ 2; 
 
     if (modelUrl.toLowerCase().endsWith(".stl")) {
-      object.rotation.x = -Math.PI / 2; 
+      object.rotation.x= -Math.PI / 2; 
     }
 
-    object.traverse((child) => {
+    object.traverse((child) =>{
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
 
@@ -177,43 +173,43 @@ const ModelCanvas: React.FC<ModelCanvasProps> = ({
     setInitialized(true);
   };
 
-
-  useEffect(() => {
+  //For resizing
+  useEffect(()=>{
     if (modelRef.current) {
       modelRef.current.scale.set(scale, scale, scale);
     }
   }, [scale]);
 
-  useEffect(() => {
+  //Positioning
+  useEffect(() =>{
     if (modelRef.current) {
-      modelRef.current.position.set(position.x, position.y, position.z);
-    }
-  }, [position]);
+      modelRef.current.position.set(position.x, position.y, position.z);}
+  },[position]);
 
+  //Toggle wireframe
   useEffect(() => {
     if (modelRef.current) {
       modelRef.current.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
-          const mesh = child as THREE.Mesh;
+          const mesh =child as THREE.Mesh;
           if (mesh.material instanceof THREE.MeshStandardMaterial) {
             mesh.material.color.set(new THREE.Color(color));
-            mesh.material.wireframe = wireframe;
+            mesh.material.wireframe =wireframe;
           }
-        }
-      });
+        }});
     }
-  }, [color, wireframe]);
+  }, [color,wireframe]);
 
+  //Lightning hook
   useEffect(() => {
     if (ambientLightRef.current) ambientLightRef.current.intensity = ambientIntensity;
     if (directionalLightRef.current) directionalLightRef.current.intensity = directionalIntensity;
   }, [ambientIntensity, directionalIntensity]);
 
-
-  
+  //Scene color
   useEffect(() => {
     if (sceneRef.current) {
-      sceneRef.current.background = new THREE.Color(bgColor);
+      sceneRef.current.background= new THREE.Color(bgColor);
     }
   }, [bgColor]);
 

@@ -70,6 +70,13 @@ Open your browser and navigate to:
 http://localhost:3000
 ```
 
+### Screenshot 1
+<img src="ScreenShots/Screenshot (53).png" alt="Screenshot 1" width="600">
+
+### Screenshot 2
+<img src="ScreenShots/Screenshot (54).png" alt="Screenshot 2" width="600">
+
+
 ## Features
 - **3D File Import**: Load **.obj** and **.stl** files seamlessly.
 - **Interactive Viewing**: Rotate, zoom, move, export in different format, change color with smooth controls.
@@ -79,8 +86,9 @@ http://localhost:3000
 
 ## Technologies Used
 - **Frontend**: Next.js, Three.js
+- **Backend**: Flask
 - **Styling**: Tailwind CSS
-- **File Processing**: OBJ and STL parsers
+- **File Processing**: OBJ and STL Loaders
 
 ## Testing Routes for Flask Model Conversion API
 
